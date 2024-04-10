@@ -14,6 +14,8 @@ import argparse
 
 # Palavras Reservadas
 reserved = {
+    'define' : 'DEFINE',
+    'include' : 'INCLUDE',
     'if' : 'IF',
     'else' : 'ELSE',
     'int' : 'INT',
@@ -25,15 +27,19 @@ reserved = {
     'break' : 'BREAK',
     'continue' : 'CONTINUE',
     'return' : 'RETURN',
-    'void' : 'VOID'
+    'void' : 'VOID',
+    'char' : 'CHAR',
+    'struct' : 'STRUCT',
+    'typedef' : 'TYPEDEF',
 }
 
 # Demais Tokens
 tokens = [
-    'EQUALS', 'PLUS', 'MINUS', 'TIMES', 'DIVIDE', 'POWER',
-    'LEFTPAREN', 'RIGHTPAREN', 'LESSTHEN', 'LESSEQUAL', 'GREATERTHEN', 'GREATEREQUAL', 'NOTEQUAL',
-    'COMMA', 'SEMICOLON', 'INTEGERCONST', 'FLOATCONST', 'STRING',
-    'ID', 'RIGHTBRACES', 'LEFTBRACES'
+    'ATTRIBUTION', 'PLUS', 'MINUS', 'TIMES', 'DIVIDE',
+    'LESSTHEN', 'LESSEQUAL', 'GREATERTHEN', 'GREATEREQUAL', 'NOTEQUAL', 'EQUALTO', 'LOGICALAND', 'LOGICALOR', 'LOGICALNOT', 'BITWISEAND', 'BITWISEOR', 'BITWISEXOR', 'BITWISENOT', 'LEFTSHIFT', 'RIGHTSHIFT',
+    'COMMA', 'SEMICOLON', 'LEFTPAREN', 'RIGHTPAREN', 'RIGHTBRACES', 'LEFTBRACES', 'MODULE', "INCREMENT", "DECREMENT", "POINTER", "DOT",
+    'ID', 'INTEGERCONST', 'FLOATCONST', 'STRING' ,
+    'INCLUDECONTENT', 'HASH'
 ] + list(reserved.values())
 
 t_ignore = ' \t\n'
@@ -56,26 +62,57 @@ def t_ID(t):
     t.type = reserved.get(t.value,'ID')    # Check for reserved words
     return t
 
-t_EQUALS = r'='
-t_PLUS = r'\+'
-t_MINUS = r'-'
-t_TIMES = r'\*'
-t_POWER = r'\^'
-t_DIVIDE = r'/'
-t_LEFTPAREN = r'\('
-t_RIGHTPAREN = r'\)'
-t_RIGHTBRACES = r'\}'
-t_LEFTBRACES = r'\{'
-t_SEMICOLON = r'\;'
+"""
+    Essa função funciona da seguinte maneira:
+    - pega todo o conteudo dentro de <> na linha em que contem a palavra include
+"""
+def t_INCLUDECONTENT(t):
+    r'<.*?>'
+    return t
+
+
+t_LOGICALAND = r'&&'
+t_LOGICALOR = r'\|\|'
+t_LOGICALNOT = r'!'
+t_EQUALTO = r'=='
+t_ATTRIBUTION = r'='
+t_BITWISEAND = r'&'
+t_BITWISEOR = r'\|'
+t_BITWISEXOR = r'\^'
+t_BITWISENOT = r'~'
+t_LEFTSHIFT = r'<<'
+t_RIGHTSHIFT = r'>>'
 t_LESSTHEN = r'<'
 t_LESSEQUAL = r'<='
 t_GREATERTHEN = r'>'
 t_GREATEREQUAL = r'>='
 t_NOTEQUAL = r'!='
+t_MODULE = r'%'
+t_INCREMENT = r'\+\+'
+t_DECREMENT = r'--'
+t_POINTER = r'->'
+t_DOT = r'\.'
+
+
+t_PLUS = r'\+'
+t_MINUS = r'-'
+t_TIMES = r'\*'
+t_DIVIDE = r'/'
+
+t_LEFTPAREN = r'\('
+t_RIGHTPAREN = r'\)'
+t_RIGHTBRACES = r'\}'
+t_LEFTBRACES = r'\{'
+t_SEMICOLON = r'\;'
 t_COMMA = r'\,'
+
+
 t_INTEGERCONST = r'\d+'
 t_FLOATCONST = r'((\d*\.\d+)(E[\+-]?\d+)?|([1-9]\d*E[\+-]?\d+))'
 t_STRING = r'\".*?\"'
+t_HASH = r'\#'
+
+
 
 
 
