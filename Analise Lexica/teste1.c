@@ -1,6 +1,11 @@
 int main()
 {
+    // comenbtario
+    /*
+    aaaaaaaaa
 
+    aaaa
+    */
     int age = 6;
     int level = 0;
 
@@ -19,4 +24,4 @@ int main()
             level = 3;
         }
     }
-}   
+}

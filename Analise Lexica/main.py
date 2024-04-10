@@ -38,17 +38,12 @@ tokens = [
 
 t_ignore = ' \t\n'
 
-"""
-    Essa função funciona da seguinte maneira: 
-    - A função t_REM é responsável por reconhecer comentários no código fonte.
-    - A expressão regular deve reconhecer qualquer sequencia de texto de 1 linha que comece com '//'.
-    - A função retorna o token t.
-
-    - REM é uma abreviação de REMARK, que é uma palavra reservada utilizada em BASIC para comentários.
-    """
-def t_REM(t):
-    r'//.*'
-    return t
+def t_ignore_COMMENT(t):
+    r'//.*\n'
+    pass
+def t_ignore_COMMENTBLOCK(t):
+    r'/\*(.|\n)*?\*/'
+    pass
 
 """
     Essa função funciona da seguinte maneira: 
@@ -57,7 +52,7 @@ def t_REM(t):
     - A função retorna o token t.
 """
 def t_ID(t):
-    r'[a-zA-Z][a-zA-Z0-9]*'
+    r'[_a-zA-Z][_a-zA-Z0-9]*'
     t.type = reserved.get(t.value,'ID')    # Check for reserved words
     return t
 
