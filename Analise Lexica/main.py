@@ -33,10 +33,10 @@ tokens = [
     'EQUALS', 'PLUS', 'MINUS', 'TIMES', 'DIVIDE', 'POWER',
     'LEFTPAREN', 'RIGHTPAREN', 'LESSTHEN', 'LESSEQUAL', 'GREATERTHEN', 'GREATEREQUAL', 'NOTEQUAL',
     'COMMA', 'SEMICOLON', 'INTEGERCONST', 'FLOATCONST', 'STRING',
-    'ID', 'NEWLINE', 'RIGHTBRACES', 'LEFTBRACES'
+    'ID', 'RIGHTBRACES', 'LEFTBRACES'
 ] + list(reserved.values())
 
-t_ignore = ' \t'
+t_ignore = ' \t\n'
 
 """
     Essa função funciona da seguinte maneira: 
@@ -83,17 +83,7 @@ t_FLOATCONST = r'((\d*\.\d+)(E[\+-]?\d+)?|([1-9]\d*E[\+-]?\d+))'
 t_STRING = r'\".*?\"'
 
 
-"""
-    Essa função funciona da seguinte maneira: 
-    - A função t_NEWLINE é responsável por reconhecer quebra de linha no código fonte.
-    - A expressão regular r'\n' reconhece qualquer quebra de linha.
-    - A função incrementa o contador de linhas e retorna o token t.
-"""
-def t_NEWLINE(t):
-    r'\n'
-    t.lexer.lineno += 1
-    print("Nova linha")
-    return t
+
 
 """
     Essa função funciona da seguinte maneira: 
