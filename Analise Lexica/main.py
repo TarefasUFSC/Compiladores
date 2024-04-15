@@ -14,8 +14,6 @@ import argparse
 
 # Palavras Reservadas
 reserved = {
-    'define' : 'DEFINE',
-    'include' : 'INCLUDE',
     'if' : 'IF',
     'else' : 'ELSE',
     'int' : 'INT',
@@ -39,7 +37,7 @@ tokens = [
     'LESSTHEN', 'LESSEQUAL', 'GREATERTHEN', 'GREATEREQUAL', 'NOTEQUAL', 'EQUALTO', 'LOGICALAND', 'LOGICALOR', 'LOGICALNOT', 'BITWISEAND', 'BITWISEOR', 'BITWISEXOR', 'BITWISENOT', 'LEFTSHIFT', 'RIGHTSHIFT',
     'COMMA', 'SEMICOLON', 'LEFTPAREN', 'RIGHTPAREN', 'RIGHTBRACES', 'LEFTBRACES', 'MODULE', "INCREMENT", "DECREMENT", "POINTER", "DOT",
     'ID', 'INTEGERCONST', 'FLOATCONST', 'STRING' ,
-    'INCLUDECONTENT', 'HASH'
+    'INCLUDECONTENT', 'HASH', 'INCLUDE', 'DEFINE'
 ] + list(reserved.values())
 
 t_ignore = ' \t\n'
@@ -70,6 +68,13 @@ def t_INCLUDECONTENT(t):
     r'<.*?>'
     return t
 
+def t_INCLUDE(t):
+    r'\#include'
+    return t
+
+def t_DEFINE(t):
+    r'\#define'
+    return t
 
 t_LOGICALAND = r'&&'
 t_LOGICALOR = r'\|\|'
