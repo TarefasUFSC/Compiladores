@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-
+#include "teste.h"
 #define MAX 100
 
 // Estrutura para um ponto em um espaço 2D
