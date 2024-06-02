@@ -24,7 +24,7 @@ class TokenRules():
             'ATTRIBUTION', 'PLUS', 'MINUS', 'TIMES', 'DIVIDE',
             'LESSTHEN', 'LESSEQUAL', 'GREATERTHEN', 'GREATEREQUAL', 'NOTEQUAL', 'EQUALTO', 'LOGICALAND', 'LOGICALOR', 'LOGICALNOT', 'BITWISEAND', 'BITWISEOR', 'BITWISEXOR', 'BITWISENOT', 'LEFTSHIFT', 'RIGHTSHIFT',
             'COMMA', 'SEMICOLON', 'LEFTPAREN', 'RIGHTPAREN', 'RIGHTBRACES', 'LEFTBRACES', 'MODULE', "INCREMENT", "DECREMENT", "POINTER", "DOT",
-            'ID', 'INTEGERCONST', 'FLOATCONST', 'STRING' ,
+            'ID', 'INTEGERCONST', 'FLOATCONST', 'CHARCONST', 'STRING' ,
             'INCLUDECONTENT', 'INCLUDE', 'DEFINE'
         ] + list(self.reserved.values())
 
@@ -104,6 +104,7 @@ class TokenRules():
     t_INTEGERCONST = r'\d+'
     t_FLOATCONST = r'((\d*\.\d+)(E[\+-]?\d+)?|([1-9]\d*E[\+-]?\d+))'
     t_STRING = r'\".*?\"'
+    t_CHARCONST = r'\'[a-zA-Z0-9]\''
     """
         Essa função funciona da seguinte maneira: 
         - A função t_error é responsável por tratar erros léxicos no código fonte.
@@ -112,28 +113,3 @@ class TokenRules():
     def t_error(self,t):
         print("Illegal character '%s'" % t.value[0])
         t.lexer.skip(1)
-
-class Lexer(TokenRules):
-    def __init__(self):
-        TokenRules.__init__(self)
-        self._build()
-        
-    def _build(self, **kwargs):
-        self.lexer = lex.lex(module=self, **kwargs)
-
-    def input(self,data):
-        self.lexer.input(data)
-
-    def token(self):
-        return self.lexer.token()
-    
-    def tokenize(self):
-        """yield tokens"""
-        while True:
-            tok = self.lexer.token()
-            if not tok:
-                break
-            yield tok
-
-
-    

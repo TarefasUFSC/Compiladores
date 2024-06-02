@@ -1,4 +1,4 @@
-int main()
+void main()
 {
     int x = 2;
     float babu = 2.3;
@@ -6,4 +6,5 @@ int main()
     {
         printf();
     }
+    return;
 };

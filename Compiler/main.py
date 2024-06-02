@@ -1,7 +1,7 @@
 
 import argparse
 
-from Lexer.lexer import Lexer
+from analyser.compiler import Compiler
 
 
 
@@ -16,9 +16,12 @@ if __name__ == '__main__':
     print(file_text_utf8)
     # Construção do analisador léxico
     
-    lexer = Lexer()
-    lexer.input(file_text_utf8)
+    compiler = Compiler()
+    compiler.input(file_text_utf8)
 
     # Tokenização
-    for token in lexer.tokenize():
+    for token in compiler.tokenize():
         print(token)
+    
+    # chama o parser
+    compiler.parse(file_text_utf8)
