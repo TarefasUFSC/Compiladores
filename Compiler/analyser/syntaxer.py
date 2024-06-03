@@ -17,6 +17,8 @@ class SyntaxRules():
             print(i, end=" ")
         print()
         pass
+
+    
     
     def p_func_name(self,p):
         '''func_name : ID
@@ -43,8 +45,18 @@ class SyntaxRules():
         pass
 
     def p_contexto(self,p):
-        '''contexto : LEFTBRACES conteudo RIGHTBRACES'''
+        '''contexto : LEFTBRACES conteudo RIGHTBRACES
+                    | LEFTBRACES conteudo retorno RIGHTBRACES'''
         print(f"Reconheci Contexto")
+        pass
+
+    def p_retorno(self,p):
+        '''retorno : RETURN valor SEMICOLON
+                    | RETURN SEMICOLON'''
+        print(f"Reconheci Retorno: p=", end="")
+        for i in p:
+            print(i, end=" ")
+        print()
         pass
 
     def p_empty(self,p):
@@ -146,8 +158,7 @@ class SyntaxRules():
         pass
 
     def p_palavra_reservada(self,p):
-        '''palavra_reservada : RETURN
-                            | BREAK
+        '''palavra_reservada : BREAK
                             | CONTINUE'''
         print(f"Reconheci Palavra Reservada")
         pass
