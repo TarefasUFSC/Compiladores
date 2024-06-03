@@ -83,7 +83,7 @@ class SyntaxRules():
 
     def p_comandos(self,p):
         '''comandos : atribuicao SEMICOLON
-                    | loop SEMICOLON
+                    | loop
                     | condicional SEMICOLON
                     | func_call SEMICOLON
                     | palavra_reservada SEMICOLON'''
