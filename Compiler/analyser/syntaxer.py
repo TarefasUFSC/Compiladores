@@ -2,12 +2,31 @@ from ply import *
 
 class SyntaxRules():
     def p_inicial(self,p):
-        '''inicial : declaracoes_func'''
+        '''inicial : declaracoes_func inicial
+                    | includes inicial
+                    | defines inicial
+                    | declaracoes
+                    | empty'''
         print(f"Reconheci INICIAL: p=", end="")
         for i in p:
             print(i, end=" ")
         print()
         pass
+    def p_includes(self,p):
+        '''includes : INCLUDE INCLUDECONTENT includes
+                    | INCLUDE STRING includes
+                    | empty'''
+        print(f"Reconheci Includes: p=", end="")
+        for i in p:
+            print(i, end=" ")
+        print()
+        pass
+
+    def p_defines(self,p):
+        '''defines : DEFINE ID constants defines
+                    | empty'''
+        pass
+
 
     def p_declaracoes_func(self,p):
         '''declaracoes_func : tipos func_name LEFTPAREN declaracao_parametros RIGHTPAREN contexto SEMICOLON declaracoes_func
@@ -74,7 +93,8 @@ class SyntaxRules():
         pass
 
     def p_declaracoes(self,p):
-        '''declaracoes : tipos definicoes SEMICOLON'''
+        '''declaracoes : tipos definicoes SEMICOLON
+                        | TYPEDEF STRUCT contexto ID SEMICOLON'''
         print(f"Reconheci Declarações")
         pass
     def p_definicoes(self,p):
@@ -86,11 +106,22 @@ class SyntaxRules():
         pass
 
     def p_valor(self,p):
-        '''valor : INTEGERCONST
-                | FLOATCONST
-                | STRING
-                | CHARCONST
-                | ID'''
+        '''valor : constants
+                | ID
+                | atributo'''
+        pass
+    def p_atributo(self,p):
+        '''atributo : ID DOT ID
+                    | ID POINTER ID
+                    | ID DOT atributo
+                    | ID POINTER atributo'''
+        pass
+
+    def p_constants(self,p):
+        '''constants : INTEGERCONST
+                    | FLOATCONST
+                    | STRING
+                    | CHARCONST'''
         pass
 
     def p_comandos(self,p):
