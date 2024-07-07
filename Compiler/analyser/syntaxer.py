@@ -197,8 +197,8 @@ class SyntaxRules():
     def p_error(self,p):
         if p:
             # print com cor vermelha
-            print("\033[91mSyntax error at '%s'\033[0m" % p.value)
+            print(f"\033[91mSyntax error at line {p.lineno} at '{p.value}'\033[0m")
         else:
-            print("\033[91mSyntax error at EOF\033[0m")
+            print(f"\033[91mSyntax error at EOF\033[0m")
 
 
