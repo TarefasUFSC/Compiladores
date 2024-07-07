@@ -2,14 +2,16 @@ from ply import *
 
 
 class Variable():
-    def __init__(self, value, type):
+    def __init__(self, value, type, context):
         self.type = type
         self.value = value
+        self.context = str(context)
+
 class VariableTable():
     def __init__(self):
         self.variables = []
         self.col_size = 10
-        self.cols = ["Nome".ljust(self.col_size) ,"Tipo".ljust(self.col_size) ]
+        self.cols = ["Nome".ljust(self.col_size) ,"Tipo".ljust(self.col_size), "Contexto".ljust(self.col_size)]
 
     def append(self, variable):
         for var in self.variables:
@@ -20,10 +22,13 @@ class VariableTable():
     
     def __str__(self):
         col_size = 10
-        content = self.cols[0] + " | " + self.cols[1] + "\n"
-        content = content+ ("-" * (col_size * 2 + 1)) + "\n"
+        content = ""
+        for col in self.cols:
+            content = content + col + " | "
+        content = content + "\n"
+        content = content+ ("-" * (col_size * 3 +8)) + "\n"
         for variable in self.variables:
-            content += variable.value.ljust(col_size) + " | " + variable.type.ljust(col_size) + "\n"
+            content += variable.value.ljust(col_size) + " | " + variable.type.ljust(col_size) + " | " + variable.context.ljust(col_size) + " |\n"
 
         return content
 
@@ -119,7 +124,7 @@ class SyntaxRules():
         '''declaracoes : tipos definicoes SEMICOLON
                         | TYPEDEF STRUCT contexto ID SEMICOLON'''
         
-        self.variables_table.append(Variable(p[2], p[1]))
+        self.variables_table.append(Variable(p[2], p[1], self.context_level))
         
         self.print_variables_table()
 
