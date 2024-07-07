@@ -34,7 +34,6 @@ class TokenRules():
     def t_ignore_LINEBREAK(self,t):
         r'\n+'
         t.lexer.lineno += len(t.value)
-        print(f"Line number after LINEBREAK: {t.lexer.lineno}")  # Debug print
         pass
 
     def t_ignore_COMMENT(self,t):
@@ -44,7 +43,6 @@ class TokenRules():
     def t_ignore_COMMENTBLOCK(self,t):
         r'/\*(.|\n)*?\*/'
         t.lexer.lineno += t.value.count('\n')
-        print(f"Line number after COMMENTBLOCK: {t.lexer.lineno}")  # Debug print
         pass
 
 

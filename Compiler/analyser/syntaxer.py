@@ -7,19 +7,13 @@ class SyntaxRules():
                     | defines inicial
                     | declaracoes inicial
                     | empty'''
-        print(f"Reconheci INICIAL: p =", end=" ")
-        for i in p:
-            print(f"{i}", end=" ")
-        print()
+        
         
     def p_includes(self,p):
         '''includes : INCLUDE INCLUDECONTENT includes
                     | INCLUDE STRING includes
                     | empty'''
-        print(f"Reconheci Includes: p=", end="")
-        for i in p:
-            print(i, end=" ")
-        print()
+        
         
 
     def p_defines(self,p):
@@ -32,10 +26,6 @@ class SyntaxRules():
         '''declaracoes_func : tipos func_name LEFTPAREN declaracao_parametros RIGHTPAREN contexto declaracoes_func
                             | tipos func_name LEFTPAREN declaracao_parametros RIGHTPAREN contexto SEMICOLON declaracoes_func
                             | empty'''
-        print(f"Reconheci Declarações Func: p=", end="")
-        for i in p:
-            print(i, end=" ")
-        print()
         
 
     
@@ -43,10 +33,7 @@ class SyntaxRules():
     def p_func_name(self,p):
         '''func_name : ID
                     | MAIN'''
-        print(f"Reconheci Func Name: p=", end="")
-        for i in p:
-            print(i, end=" ")
-        print()
+        
         
 
     def p_tipos(self,p):
@@ -57,36 +44,26 @@ class SyntaxRules():
                 | STRING
                 | ID'''
         p[0] = p[1]
-        print(f"Reconheci Tipos: p=", end="")
-        for i in p:
-            print(i, end=" ")
-        print()
+        
         
 
     def p_declaracao_parametros(self,p):
         '''declaracao_parametros : tipos ID COMMA declaracao_parametros
                     | tipos ID 
                     | empty'''
-        print(f"Reconheci declaracao_Parametros:", end=" ")
-        for i in p:
-            print(i, end=" ")  
-        print()
+        
         
 
     def p_contexto(self,p):
         '''contexto : LEFTBRACES conteudo RIGHTBRACES
                     | LEFTBRACES conteudo retorno RIGHTBRACES'''
-        print(f"Reconheci Contexto", p)
         
 
     def p_retorno(self,p):
         '''retorno : RETURN valor SEMICOLON
                     | RETURN SEMICOLON
                     | RETURN func_call SEMICOLON'''
-        print(f"Reconheci Retorno: p=", end="")
-        for i in p:
-            print(i, end=" ")
-        print()
+        
         
 
     def p_empty(self,p):
@@ -97,16 +74,12 @@ class SyntaxRules():
         '''conteudo : declaracoes conteudo
                     | comandos conteudo
                     | empty'''
-        print(f"Reconheci Conteudo. p=", end="")
-        for i in p:
-            print(i, end=" ")
-        print()
+        
         
 
     def p_declaracoes(self,p):
         '''declaracoes : tipos definicoes SEMICOLON
                         | TYPEDEF STRUCT contexto ID SEMICOLON'''
-        print(f"Reconheci Declarações")
         
     def p_definicoes(self,p):
         '''definicoes : ID 
@@ -115,7 +88,6 @@ class SyntaxRules():
                     | ID COMMA definicoes
                     | ID ATTRIBUTION func_call
                     | ID ATTRIBUTION valor COMMA definicoes'''
-        print(f"Reconheci Definições")
         
 
     def p_valor(self,p):
@@ -124,10 +96,7 @@ class SyntaxRules():
                 | atributo'''
         
         p[0] = p[1]     
-        print(f"Reconheci Valor: p=", end="")
-        for i in p:
-            print(i, end=" ")
-        print()
+        
 
     
     def p_operadores(self,p):
@@ -142,10 +111,7 @@ class SyntaxRules():
     def p_operacao(self,p):
         '''operacao : valor operadores operacao
                     | valor '''
-        print(f"Reconheci operacao. p= ", end="")
-        for i in p:
-            print(i, end=" ")
-        print()
+        
         
 
     def p_operacao_especial(self,p):
@@ -160,10 +126,7 @@ class SyntaxRules():
                     | ID DOT atributo
                     | ID POINTER atributo'''
 
-        print(f"Reconheci Atributo: p=", end="")
-        for i in p:
-            print(i, end=" ")
-        print()    
+           
         
 
     def p_constants(self,p):
@@ -173,10 +136,7 @@ class SyntaxRules():
                     | CHARCONST'''
         
         p[0] = p[1]
-        print(f"Reconheci Constants: p=", end="")
-        for i in p:
-            print(i, end=" ")
-        print()
+        
 
         
 
@@ -187,13 +147,11 @@ class SyntaxRules():
                     | condicional
                     | func_call SEMICOLON
                     | palavra_reservada SEMICOLON'''
-        print(f"Reconheci Comandos")
         
     
     def p_valores(self,p):
         '''valores : valor COMMA valores
                     | valor'''
-        print(f"Reconheci Valores")
 
     def p_atribuicao(self,p):
         '''atribuicao : ID ATTRIBUTION operacao
@@ -207,12 +165,10 @@ class SyntaxRules():
     def p_loop(self,p):
         '''loop : while
                 | for'''
-        print(f"Reconheci Loop")
         
 
     def p_while(self,p):
         '''while : WHILE LEFTPAREN condicao RIGHTPAREN contexto'''
-        print(f"Reconheci While")
         
 
     def p_for(self,p):
@@ -245,7 +201,6 @@ class SyntaxRules():
 
     def p_func_call(self,p):
         '''func_call : ID LEFTPAREN parametros_chamada RIGHTPAREN'''
-        print(f"Reconheci Func Call")
         
 
     def p_parametros_chamada(self,p):
@@ -256,16 +211,12 @@ class SyntaxRules():
                             | operacao COMMA parametros_chamada
                             | empty'''
     
-        print(f"Reconheci Parametros Chamada. p=", end="")
-        for i in p:
-            print(i, end=" ")
-        print
+        
         
 
     def p_palavra_reservada(self,p):
         '''palavra_reservada : BREAK
                             | CONTINUE'''
-        print(f"Reconheci Palavra Reservada")
         
 
     def p_error(self,p):
