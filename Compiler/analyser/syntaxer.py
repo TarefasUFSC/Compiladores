@@ -96,7 +96,6 @@ class SyntaxRules():
     def p_contexto(self,p):
         '''contexto : LEFTBRACES context_content RIGHTBRACES'''
         print("diminuindo contexto")
-        print(p.stack)
         context_counter = 0
         for i in p.stack:
             if i.type == "LEFTBRACES":
@@ -135,8 +134,6 @@ class SyntaxRules():
     def p_declaracoes(self,p):
         '''declaracoes : tipos definicoes SEMICOLON
                         | TYPEDEF STRUCT contexto ID SEMICOLON'''
-        print(p.slice)
-        print(p.stack)
         context_counter = 0
         for i in p.stack:
             if i.type == "LEFTBRACES":
