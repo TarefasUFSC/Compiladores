@@ -25,11 +25,17 @@ class TokenRules():
             'LESSTHEN', 'LESSEQUAL', 'GREATERTHEN', 'GREATEREQUAL', 'NOTEQUAL', 'EQUALTO', 'LOGICALAND', 'LOGICALOR', 'LOGICALNOT', 'BITWISEAND', 'BITWISEOR', 'BITWISEXOR', 'BITWISENOT', 'LEFTSHIFT', 'RIGHTSHIFT',
             'COMMA', 'SEMICOLON', 'LEFTPAREN', 'RIGHTPAREN', 'RIGHTBRACES', 'LEFTBRACES', 'MODULE', "INCREMENT", "DECREMENT", "POINTER", "DOT",
             'ID', 'INTEGERCONST', 'FLOATCONST', 'CHARCONST', 'STRING' ,
-            'INCLUDECONTENT', 'INCLUDE', 'DEFINE'
+            'INCLUDECONTENT', 'INCLUDE', 'DEFINE',
+            'LINEBREAK'
         ] + list(self.reserved.values())
 
     
-    t_ignore = ' \t\n'
+    t_ignore = ' \t'
+
+    def t_LINEBREAK(self,t):
+        r'\n+'
+        t.lexer.lineno += len(t.value)
+        pass
 
     def t_ignore_COMMENT(self,t):
         r'//.*\n'
