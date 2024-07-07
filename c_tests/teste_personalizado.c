@@ -11,7 +11,7 @@ typedef struct
 } Ponto2D;
 
 // Função para calcular a distância entre dois pontos
-float distanciaEntrePontos(Ponto2D p1, Ponto2D p2)
+float distanciaEntrePontos(Ponto2D p1)
 {
     float dx = p1.x - p2.x;
     float dy = p1.y - p2.y;

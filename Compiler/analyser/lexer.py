@@ -38,9 +38,7 @@ class TokenRules():
         pass
 
     def t_ignore_COMMENT(self,t):
-        r'//.*\n'
-        t.lexer.lineno += 1
-        print(f"Line number after COMMENT: {t.lexer.lineno}")  # Debug print
+        r'//.*'
         pass
 
     def t_ignore_COMMENTBLOCK(self,t):
