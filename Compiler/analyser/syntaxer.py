@@ -95,13 +95,25 @@ class SyntaxRules():
 
     def p_contexto(self,p):
         '''contexto : LEFTBRACES context_content RIGHTBRACES'''
-        self.context_level -= 1
+        print("diminuindo contexto")
+        print(p.stack)
+        context_counter = 0
+        for i in p.stack:
+            if i.type == "LEFTBRACES":
+                context_counter += 1
+            if i.type == "RIGHTBRACES":
+                context_counter -= 1
+        
+        self.context_level = context_counter
+        print(f"Contexto: {context_counter}")
+        # remove variáveis do contexto que são maior que o contexto atual
+        self.variables_table.variables = [var for var in self.variables_table.variables if int(var.context) <= self.context_level]
+        self.print_variables_table()
         
 
     def p_context_content(self,p):
         '''context_content : conteudo
                             | conteudo retorno'''
-        self.context_level += 1
 
     def p_retorno(self,p):
         '''retorno : RETURN valor SEMICOLON
@@ -123,9 +135,19 @@ class SyntaxRules():
     def p_declaracoes(self,p):
         '''declaracoes : tipos definicoes SEMICOLON
                         | TYPEDEF STRUCT contexto ID SEMICOLON'''
-        
-        self.variables_table.append(Variable(p[2], p[1], self.context_level))
-        
+        print(p.slice)
+        print(p.stack)
+        context_counter = 0
+        for i in p.stack:
+            if i.type == "LEFTBRACES":
+                context_counter += 1
+        self.context_level = context_counter
+        print(f"Contexto: {context_counter}")
+        if(len(p) == 4):
+            self.variables_table.append(Variable(p[2], p[1], self.context_level))
+        # else:
+        # TODO: Implementar criação de tipos
+        #     self.variables_table.append(Variable(p[4], "STRUCT", self.context_level))
         self.print_variables_table()
 
         
