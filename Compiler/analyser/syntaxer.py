@@ -1,6 +1,40 @@
 from ply import *
 
+
+class Variable():
+    def __init__(self, value, type):
+        self.type = type
+        self.value = value
+class VariableTable():
+    def __init__(self):
+        self.variables = []
+        self.col_size = 10
+        self.cols = ["Nome".ljust(self.col_size) ,"Tipo".ljust(self.col_size) ]
+
+    def append(self, variable):
+        for var in self.variables:
+            if var.value == variable.value:
+                print(f"\033[91mErro: Variável {p[2]} já foi declarada\033[0m")
+                exit(1)
+        self.variables.append(variable)
+    
+    def __str__(self):
+        col_size = 10
+        content = self.cols[0] + " | " + self.cols[1] + "\n"
+        content = content+ ("-" * (col_size * 2 + 1)) + "\n"
+        for variable in self.variables:
+            content += variable.value.ljust(col_size) + " | " + variable.type.ljust(col_size) + "\n"
+
+        return content
+
 class SyntaxRules():
+    variables_table = VariableTable()
+    context_level = 0
+
+    def print_variables_table(self):
+        print("\n\nTabela de variáveis:")
+        print(self.variables_table)
+
     def p_inicial(self,p):
         '''inicial : declaracoes_func inicial
                     | includes inicial
@@ -55,9 +89,14 @@ class SyntaxRules():
         
 
     def p_contexto(self,p):
-        '''contexto : LEFTBRACES conteudo RIGHTBRACES
-                    | LEFTBRACES conteudo retorno RIGHTBRACES'''
+        '''contexto : LEFTBRACES context_content RIGHTBRACES'''
+        self.context_level -= 1
         
+
+    def p_context_content(self,p):
+        '''context_content : conteudo
+                            | conteudo retorno'''
+        self.context_level += 1
 
     def p_retorno(self,p):
         '''retorno : RETURN valor SEMICOLON
@@ -75,11 +114,16 @@ class SyntaxRules():
                     | comandos conteudo
                     | empty'''
         
-        
 
     def p_declaracoes(self,p):
         '''declaracoes : tipos definicoes SEMICOLON
                         | TYPEDEF STRUCT contexto ID SEMICOLON'''
+        
+        self.variables_table.append(Variable(p[2], p[1]))
+        
+        self.print_variables_table()
+
+        
         
     def p_definicoes(self,p):
         '''definicoes : ID 
@@ -89,6 +133,8 @@ class SyntaxRules():
                     | ID ATTRIBUTION func_call
                     | ID ATTRIBUTION valor COMMA definicoes'''
         
+        p[0] = p[1]
+
 
     def p_valor(self,p):
         '''valor : constants
@@ -113,6 +159,7 @@ class SyntaxRules():
                     | valor '''
         
         
+        
 
     def p_operacao_especial(self,p):
         '''operacao_especial : ID INCREMENT
@@ -135,8 +182,9 @@ class SyntaxRules():
                     | STRING
                     | CHARCONST'''
         
-        p[0] = p[1]
         
+
+
 
         
 
@@ -152,15 +200,16 @@ class SyntaxRules():
     def p_valores(self,p):
         '''valores : valor COMMA valores
                     | valor'''
+        
 
     def p_atribuicao(self,p):
         '''atribuicao : ID ATTRIBUTION operacao
                     | ID ATTRIBUTION valor
                     | ID ATTRIBUTION LEFTBRACES valores RIGHTBRACES
                     | ID ATTRIBUTION func_call
-                    | ID INCREMENT
-                    | ID DECREMENT'''
+                    | operacao_especial'''
         
+    
 
     def p_loop(self,p):
         '''loop : while
@@ -201,7 +250,6 @@ class SyntaxRules():
 
     def p_func_call(self,p):
         '''func_call : ID LEFTPAREN parametros_chamada RIGHTPAREN'''
-        
 
     def p_parametros_chamada(self,p):
         '''parametros_chamada : valor
