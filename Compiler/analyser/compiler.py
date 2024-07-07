@@ -22,7 +22,7 @@ class Compiler(TokenRules, SyntaxRules):
     def tokenize(self):
         """yield tokens"""
         while True:
-            tok = self.lexer.token()
+            tok = self.token()
             if not tok:
                 break
             yield tok

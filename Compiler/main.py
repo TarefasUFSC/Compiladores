@@ -17,11 +17,15 @@ if __name__ == '__main__':
     # Construção do analisador léxico
     
     compiler = Compiler()
-    compiler.input(file_text_utf8)
 
-    # Tokenização
-    for token in compiler.tokenize():
-        print(token)
+    # o parser sintatico chama o lexer by default, então removi isso aqui. Se quiser depurar os tokens ai tem que descomentar
+    # compiler.input(file_text_utf8)
+
+    # # Tokenização
+    # for token in compiler.tokenize():
+    #     print(token)
     
+
+    # ---
     # chama o parser
     compiler.parse(file_text_utf8)

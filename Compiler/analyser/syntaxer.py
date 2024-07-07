@@ -66,7 +66,7 @@ class SyntaxRules():
     def p_contexto(self,p):
         '''contexto : LEFTBRACES conteudo RIGHTBRACES
                     | LEFTBRACES conteudo retorno RIGHTBRACES'''
-        print(f"Reconheci Contexto")
+        print(f"Reconheci Contexto", p)
         pass
 
     def p_retorno(self,p):
@@ -98,7 +98,7 @@ class SyntaxRules():
         print(f"Reconheci Declarações")
         pass
     def p_definicoes(self,p):
-        '''definicoes : ID SEMICOLON
+        '''definicoes : ID 
                     | ID ATTRIBUTION valor
                     | ID COMMA definicoes
                     | ID ATTRIBUTION valor COMMA definicoes'''
@@ -193,4 +193,11 @@ class SyntaxRules():
                             | CONTINUE'''
         print(f"Reconheci Palavra Reservada")
         pass
+
+    def p_error(self,p):
+        if p:
+            print(f"Syntax error at line {p.lineno}, token={p.type}")
+        else:
+            print("Syntax error at EOF")
+
 
