@@ -153,11 +153,53 @@ class Functionstable():
                 return function
         return None
 
+class Define():
+    def __init__(self, name, value,type):
+        self.name =name
+        self.type = type
+        self.value = value
+
+class DefinesTable():
+    def __init__(self):
+        self.defines = []
+        self.col_size = 10
+        self.cols = ["Nome".ljust(self.col_size), "Valor".ljust(self.col_size), "Tipo".ljust(self.col_size)]
+
+    def append(self, define):
+        print("deeee")
+        for defin in self.defines:
+            if defin.name == define.name:
+                print(f"\033[91mErro: Função {define.name} já foi declarada\033[0m")
+                exit(1)
+        self.defines.append(define)
+
+    def __str__(self):
+        biggest_len = self.col_size
+        for defin in self.defines:
+            if len(defin.name) > biggest_len:
+                biggest_len = len(defin.name)
+        self.col_size = biggest_len + 2
+        content = ""
+        for col in self.cols:
+            content = content + col.ljust(self.col_size) + " | "
+        content = content + "\n"
+        content = content+ ("-" * (self.col_size * 3 +8)) + "\n"
+        for defin in self.defines:
+            content += defin.name.ljust(self.col_size) + " | " + defin.value.ljust(self.col_size) + " | " + defin.type.ljust(self.col_size) + " |"
+        return content
+    
+    def get_by_name(self, name):
+        for defin in self.defines:
+            if defin.name == name:
+                return defin
+        return None
+
 
 class SyntaxRules():
     variables_table = VariableTable()
     structs_table = StructsTable()
     funtions_table = Functionstable()
+    defines_table = DefinesTable()
     context_level = 0
 
     def print_variables_table(self):
@@ -171,6 +213,10 @@ class SyntaxRules():
     def print_functions_table(self):
         print("\n\nTabela de funções:")
         print(self.funtions_table)
+
+    def print_defines_table(self):
+        print("\n\nTabela de Defines")
+        print(self.defines_table)
 
     def p_inicial(self,p):
         '''inicial : declaracoes_func inicial
@@ -188,8 +234,10 @@ class SyntaxRules():
         
 
     def p_defines(self,p):
-        '''defines : DEFINE ID constants defines
-                    | empty'''
+        '''defines : DEFINE ID constants'''
+        print(f"DEFINE - p0: {p[0]}, p1: {p[1]}, p2: {p[2]}, p3: {p[3]}")
+        define = Define(p[2], p[3]["value"], p[3]["type"])
+        self.defines_table.append(define)
         
 
 
@@ -401,8 +449,12 @@ class SyntaxRules():
         if p.slice[1].type == "ID":
             var = self.variables_table.get_by_name(p[1])
             if var is None:
-                print(f"\033[91mErro: Variável {p[1]} não foi declarada (valor). Erro na linha {p.lineno(1)}\033[0m")
-                exit(1)
+                self.print_defines_table()
+
+                var = self.defines_table.get_by_name(p[1])
+                if var is None:
+                    print(f"\033[91mErro: Variável {p[1]} não foi declarada (valor). Erro na linha {p.lineno(1)}\033[0m")
+                    exit(1)
             p[0] = {"type": var.type}
         else:
             p[0] = {"type": p[1]["type"]}
@@ -469,6 +521,11 @@ class SyntaxRules():
     def p_operacao_especial(self,p):
         '''operacao_especial : ID INCREMENT
                             | ID DECREMENT'''
+        # checa se a variável foi declarada
+        var = self.variables_table.get_by_name(p[1])
+        if var is None:
+            print(f"\033[91mErro: Variável {p[1]} não foi declarada\033[0m")
+            exit(1)
 
         
 
@@ -490,13 +547,13 @@ class SyntaxRules():
         
         match p.slice[1].type:
             case "INTEGERCONST":
-                p[0] = {"type": "int"}
+                p[0] = {"type": "int", "value": p[1]}
             case "FLOATCONST":
-                p[0] = {"type": "float"}
+                p[0] = {"type": "float", "value": p[1]}
             case "STRING":
-                p[0] = {"type": "string"}
+                p[0] = {"type": "string", "value": p[1]}
             case "CHARCONST":
-                p[0] = {"type": "char"}
+                p[0] = {"type": "char", "value": p[1]}
             case _:
                 print(f"\033[91mErro: Constante {p[1]} não reconhecida\033[0m - ISSO NÃO DEVIA TER ACONTECIDO")
                 exit(1)
@@ -513,10 +570,10 @@ class SyntaxRules():
         
 
     def p_for(self,p):
-        '''for : FOR LEFTPAREN tipos ID SEMICOLON condicao SEMICOLON ID atribuicao RIGHTPAREN contexto
-                | FOR LEFTPAREN tipos ID SEMICOLON condicao SEMICOLON operacao_especial RIGHTPAREN contexto
-                | FOR LEFTPAREN tipos ID ATTRIBUTION valor SEMICOLON condicao SEMICOLON ID atribuicao RIGHTPAREN contexto
-                | FOR LEFTPAREN tipos ID ATTRIBUTION valor SEMICOLON condicao SEMICOLON operacao_especial RIGHTPAREN contexto'''
+        '''for : FOR LEFTPAREN ID SEMICOLON condicao SEMICOLON ID atribuicao RIGHTPAREN contexto
+                | FOR LEFTPAREN ID SEMICOLON condicao SEMICOLON operacao_especial RIGHTPAREN contexto
+                | FOR LEFTPAREN ID ATTRIBUTION valor SEMICOLON condicao SEMICOLON ID atribuicao RIGHTPAREN contexto
+                | FOR LEFTPAREN ID ATTRIBUTION valor SEMICOLON condicao SEMICOLON operacao_especial RIGHTPAREN contexto'''
         
         # declaração de variável
         print(f"FOR DETECTADO")

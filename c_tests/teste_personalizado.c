@@ -34,7 +34,8 @@ int main()
     // printf("A distância entre os pontos é: %.2f\n", distancia);
 
     // Exemplo de loop e condicionais
-    for (int i = 0; i < MAX; i++)
+    int i; // tem que declarar antes do loop... não consegui colocar o i na tabela pq ele ta à esquerda na expressão
+    for (i = 0; i < MAX; i++)
     {
         if (i % 2 == 0)
         {
@@ -46,7 +47,7 @@ int main()
             // printf("Número ímpar: %d\n", i);
         }
     }
-    int i = 0;
+    i = 0;
     i++;
     i--;
     return 0;
