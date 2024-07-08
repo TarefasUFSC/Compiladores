@@ -283,7 +283,6 @@ class SyntaxRules():
         '''declaracoes : tipos definicoes SEMICOLON
                         | TYPEDEF STRUCT contexto_struct ID SEMICOLON'''
         context_counter = 0
-        print(f"aaa: {p[2]}")
         for i in p.stack:
             if i.type == "LEFTBRACES":
                 context_counter += 1
@@ -338,19 +337,14 @@ class SyntaxRules():
                     | ID atribuicao COMMA definicoes'''
         
         types = []
-        print(f"entrando em defincioções na linha {p.lineno(1)}")
         if len(p) == 4:
             types = p[3]["type"]
             types.append({"name": p[1], "type": None})
-            print(f"fim types: {types}")
         elif len(p) == 5:
             types = p[4]["type"]
             types.append({"name": p[1], "type": None})
-            print(f"fim types: {types}")
         else:
-            print("sexo")
             types.append({"name": p[1], "type": None})
-            print(f"types depois do sexo: {types}")
         
         p[0] = {"type": types}
 
@@ -424,7 +418,6 @@ class SyntaxRules():
         p[0] = p[1]
 
     def get_value_type(self, value):
-        print(f"get value type: {value}")
         if (isinstance(value, list)):
             struct_name = ""
             for i in range(len(value)):
