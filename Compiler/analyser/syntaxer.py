@@ -54,7 +54,6 @@ class Struct():
     
     def get_attr_by_name(self, name):
         for attr in self.attributes:
-            print(f"attr.attr_name: {attr.attr_name} name: {name}")
             if attr.attr_name == name:
                 return attr
         return None
@@ -154,7 +153,7 @@ class SyntaxRules():
                     | defines inicial
                     | declaracoes inicial
                     | empty'''
-        
+        print("inicial")
         
     def p_includes(self,p):
         '''includes : INCLUDE INCLUDECONTENT includes
@@ -218,7 +217,6 @@ class SyntaxRules():
 
     def p_contexto(self,p):
         '''contexto : LEFTBRACES context_content RIGHTBRACES'''
-        print("diminuindo contexto")
         context_counter = 0
         for i in p.stack:
             if i.type == "LEFTBRACES":
@@ -227,7 +225,6 @@ class SyntaxRules():
                 context_counter -= 1
         
         self.context_level = context_counter
-        print(f"Contexto: {context_counter}")
         # remove variáveis do contexto que são maior que o contexto atual
         self.variables_table.variables = [var for var in self.variables_table.variables if int(var.context) <= self.context_level]
         # self.print_variables_table()
@@ -262,12 +259,9 @@ class SyntaxRules():
             if i.type == "LEFTBRACES":
                 context_counter += 1
         self.context_level = context_counter
-        print(f"Contexto: {context_counter}")
         if(len(p) == 4):
             # checa o tipo
             if p[2]["type"] is not None:
-                self.print_variables_table()
-                print(f"p2: {p[2]}")
                 p2_type = self.get_value_type(p[2]["type"])
 
                 p1_type = p[1]
@@ -280,22 +274,16 @@ class SyntaxRules():
                     exit(1)
             self.variables_table.append(Variable(p[2]["name"], p[1], self.context_level))
         # else:
-        # TODO: Implementar criação de tipos
         else:
             attributes = []
-            print(f"Criando struct {p[4]} com os atributos {p[3]}")
             for attr in p[3]["attr"]:
                 attributes.append(StructAttribute(attr["name"], attr["type"]))
             self.structs_table.append(Struct(p[4], attributes))
-            print(f"Struct {p[4]} criada com os atributos {attributes}")
 
 
-        self.print_variables_table()
-        self.print_structs_table()
 
     def p_contexto_struct(self,p):
         '''contexto_struct : LEFTBRACES struct_content RIGHTBRACES'''
-        print(f"struct content p[2]: {p[2]}")
         p[0] = p[2]
 
     def p_struct_content(self,p):
@@ -311,7 +299,6 @@ class SyntaxRules():
                     attrs_p4.append(attr)
             p[0] = {"attr": attrs_p4}           
 
-        print(f"Struct content: {p[0]}")
 
 
     def p_definicoes(self,p):
@@ -368,7 +355,6 @@ class SyntaxRules():
         else:
             p[0] = {"type": p[2]["type"]}
 
-        print(f"atribuição de {p[0]['type']}")
 
     def p_valor(self,p):
         '''valor : constants
@@ -398,19 +384,23 @@ class SyntaxRules():
         if (isinstance(value, list)):
             struct_name = ""
             for i in range(len(value)):
-                print(f"value[{i}]: {value[i]}")
                 value_name = self.variables_table.get_by_name(value[i])
                 if(isinstance(value[i], list)):
                     return value[i]
                 if(value_name is None):
-                    print(f"struct_name: {struct_name}")
                     attr_name = value[i]
-                    value_name = self.structs_table.get_by_name(struct_name).get_attr_by_name(attr_name).attr_type
-                    print(f"value struct: {value_name}")
+                    value_name = self.structs_table.get_by_name(struct_name)
+                    if(value_name is None):
+                        print(f"\033[91mErro: variável {attr_name} não encontrada\033[0m")
+                        exit(1)
+                    value_name = value_name.get_attr_by_name(attr_name)
+                    if(value_name is None):
+                        print(f"\033[91mErro: Atributo {attr_name} não encontrado na struct {struct_name}\033[0m")
+                        exit(1)
+                    value_name = value_name.attr_type
                     return value_name
                 else:
                     struct_name = value_name.type
-                    print(f"setting struct_name: {struct_name}")
         else:
             return value
 
@@ -422,16 +412,12 @@ class SyntaxRules():
         if len(p) == 2:
             p[0] = {"type": p[1]["type"]}
         else:
-            self.print_variables_table()
-            self.print_structs_table()
-            print(f'p1: {p[1]} | p2: {p[2]}')
 
             p1_type = self.get_value_type(p[1]["type"])
             p3_type = self.get_value_type(p[3]["type"])
             
             
 
-            print(f"p1_type: {p1_type} p3_type: {p3_type}")
             if p1_type != p3_type:
                 print(f"\033[91mErro: Operação entre tipos incompatíveis {p[1]['type']} e {p[3]['type']} na linha {p.lineno(3)}\033[0m")
                 print(f"DEV COMMENT: Só pode operação com o mesmo tipo de variável por enquanto")
