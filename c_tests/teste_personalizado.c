@@ -26,7 +26,7 @@ float distanciaEntrePontos(Ponto2D p1, Ponto2D p2)
 
 int main()
 {
-    Ponto2D ponto1 = {2.5, 3.1};
+    Ponto2D ponto1 = {2.5, 3};
     Ponto2D ponto2 = {4.6, 5.0};
 
     /* Cálculo e exibição da distância entre dois pontos */

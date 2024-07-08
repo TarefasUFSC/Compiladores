@@ -337,10 +337,27 @@ class SyntaxRules():
                             p1_type = self.structs_table.get_by_name(p1_type).get_types_list()
                         
                         if p2_type is not None:
+                            print(f'p1_type: {p1_type} p2_type: {p2_type}')
                             if p1_type != p2_type:
                                 print(f"\033[91mErro: Tipo {p[1]} não é compatível com {p2_type}. Erro na linha {p.lineno(3)}\033[0m")
                                 exit(1)
+                    else:
+                        if(new_var["type"] is not None):
+                            p2_type = self.get_value_type(new_var["type"])
+                            p1_type = p[1]
+                            print(f"p1_type: {p1_type} p2_type: {p2_type}")
+                            if(self.structs_table.get_by_name(p1_type) is not None):
+                                p1_type = self.structs_table.get_by_name(p1_type).get_types_list()
+                            
+                            if p2_type is not None:
+                                print(f'p1_type: {p1_type} p2_type: {p2_type}')
+                                if p1_type != p2_type:
+                                    print(f"\033[91mErro: Tipo {p[1]} não é compatível com {p2_type}. Erro na linha {p.lineno(3)}\033[0m")
+                                    exit(1)
+                                    
                     self.variables_table.append(Variable(new_var["name"], p[1], self.context_level))
+
+
         # else:
         else:
             attributes = []
@@ -348,7 +365,7 @@ class SyntaxRules():
                 attributes.append(StructAttribute(attr["name"], attr["type"]))
             self.structs_table.append(Struct(p[4], attributes))
 
-
+        self.print_variables_table()
 
     def p_contexto_struct(self,p):
         '''contexto_struct : LEFTBRACES struct_content RIGHTBRACES'''
@@ -376,12 +393,15 @@ class SyntaxRules():
                     | ID atribuicao COMMA definicoes'''
         
         types = []
+
         if len(p) == 4:
             types = p[3]["type"]
             types.append({"name": p[1], "type": None})
         elif len(p) == 5:
             types = p[4]["type"]
             types.append({"name": p[1], "type": None})
+        elif len(p) == 3:
+            types.append({"name": p[1], "type": p[2]["type"]})
         else:
             types.append({"name": p[1], "type": None})
         
