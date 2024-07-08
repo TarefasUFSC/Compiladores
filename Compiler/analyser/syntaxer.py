@@ -194,11 +194,12 @@ class DefinesTable():
 
 
 class SyntaxRules():
+    last_return_type = None
+    context_level = 0
     variables_table = VariableTable()
     structs_table = StructsTable()
     funtions_table = Functionstable()
     defines_table = DefinesTable()
-    context_level = 0
 
     def print_variables_table(self):
         print("\n\nTabela de variáveis:")
@@ -241,7 +242,16 @@ class SyntaxRules():
         '''declaracoes_func : tipos func_name LEFTPAREN declaracao_parametros RIGHTPAREN contexto'''
         function = Funtion(p[2], p[1], p[4]["type"])
         self.funtions_table.append(function)
+        self.print_functions_table()
 
+        if self.last_return_type is None:
+            self.last_return_type = "void"
+
+        if self.last_return_type != function.type:
+            print(f"\033[91mErro: return {self.last_return_type} não é compatível com {function.type}. Erro na linha {p.lineno(3)}\033[0m")
+            exit(1)
+        
+        self.last_return_type = None
 
     
     
@@ -305,7 +315,12 @@ class SyntaxRules():
         '''retorno : RETURN valor SEMICOLON
                     | RETURN SEMICOLON
                     | RETURN func_call SEMICOLON'''
-        
+        if len(p) == 4:
+            if p[2] is None:
+                print(f"\033[91mErro: Retorno nulo. Erro na linha {p.lineno(1)}\033[0m")
+            self.last_return_type = p[2]["type"]
+        else:
+            self.last_return_type = "void"
         
 
     def p_empty(self,p):
