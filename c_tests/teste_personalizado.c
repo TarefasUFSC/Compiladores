@@ -3,6 +3,12 @@
 #include "teste.h"
 #define MAX 100
 
+// como eu n to fazendo o include de vdd eu vou criar a sqrt
+float sqrt(float x)
+{
+    return x;
+}
+
 // Estrutura para um ponto em um espaço 2D
 typedef struct
 {
@@ -25,19 +31,19 @@ int main()
 
     /* Cálculo e exibição da distância entre dois pontos */
     float distancia = distanciaEntrePontos(ponto1, ponto2);
-    printf("A distância entre os pontos é: %.2f\n", distancia);
+    // printf("A distância entre os pontos é: %.2f\n", distancia);
 
     // Exemplo de loop e condicionais
     for (int i = 0; i < MAX; i++)
     {
         if (i % 2 == 0)
         {
-            printf("Número par: %d\n", i);
+            // printf("Número par: %d\n", i);
         }
         else
         {
             // Comentário dentro de um bloco else
-            printf("Número ímpar: %d\n", i);
+            // printf("Número ímpar: %d\n", i);
         }
     }
     int i = 0;

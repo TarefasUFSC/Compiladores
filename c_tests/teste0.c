@@ -1,3 +1,7 @@
+void printf()
+{
+}
+
 void main()
 {
     int x = 2;
@@ -7,4 +11,4 @@ void main()
         printf();
     }
     return;
-};
+}

@@ -16,7 +16,7 @@ class VariableTable():
     def append(self, variable):
         for var in self.variables:
             if var.value == variable.value:
-                print(f"\033[91mErro: Variável {p[2]} já foi declarada\033[0m")
+                print(f"\033[91mErro: Variável {var.value} já foi declarada\033[0m")
                 exit(1)
         self.variables.append(variable)
 
@@ -106,15 +106,23 @@ class StructsTable():
     
 
 class Funtion():
-    def __init__(self, name, type):
+    def __init__(self, name, type, params):
         self.type = type
         self.name = name
+        self.params = params
+        print(f"Função {name} com tipo {type} e parâmetros {params}")
+    def get_params_str(self):
+        content = ""
+        for param in self.params:
+            content += param + ", "
+        content = content[:-2]
+        return content
 
 class Functionstable():
     def __init__(self):
         self.functions = []
         self.col_size = 10
-        self.cols = ["Nome".ljust(self.col_size), "Tipo".ljust(self.col_size)]
+        self.cols = ["Nome".ljust(self.col_size), "Tipo".ljust(self.col_size), "Parâmetros".ljust(self.col_size)]
     def append(self, function):
         for func in self.functions:
             if func.name == function.name:
@@ -123,14 +131,27 @@ class Functionstable():
         self.functions.append(function)
     
     def __str__(self):
+        biggest_len = self.col_size
+        for function in self.functions:
+            if len(function.get_params_str()) > biggest_len:
+                biggest_len = len(function.get_params_str())
+            if len(function.name) > biggest_len:
+                biggest_len = len(function.name)
+        self.col_size = biggest_len + 2
         content = ""
         for col in self.cols:
-            content = content + col + " | "
+            content = content + col.ljust(self.col_size) + " | "
         content = content + "\n"
         content = content+ ("-" * (self.col_size * 3 +8)) + "\n"
         for function in self.functions:
-            content += function.value.ljust(self.col_size) + " | " + function.type.ljust(self.col_size) + " | " + function.context.ljust(self.col_size) + " |\n"
+            content += function.name.ljust(self.col_size) + " | " + function.type.ljust(self.col_size) + " | " + function.get_params_str().ljust(self.col_size) + " |\n"
         return content
+
+    def get_by_name(self, name):
+        for function in self.functions:
+            if function.name == name:
+                return function
+        return None
 
 
 class SyntaxRules():
@@ -146,6 +167,10 @@ class SyntaxRules():
     def print_structs_table(self):
         print("\n\nTabela de structs:")
         print(self.structs_table)
+
+    def print_functions_table(self):
+        print("\n\nTabela de funções:")
+        print(self.funtions_table)
 
     def p_inicial(self,p):
         '''inicial : declaracoes_func inicial
@@ -169,12 +194,13 @@ class SyntaxRules():
 
 
     def p_declaracoes_func(self,p):
-        '''declaracoes_func : tipos func_name LEFTPAREN declaracao_parametros RIGHTPAREN contexto declaracoes_func
-                            | empty'''
+        '''declaracoes_func : tipos func_name LEFTPAREN declaracao_parametros RIGHTPAREN contexto'''
         # print em amaerelo
-        print(f"\033[93mDeclarando função\033[0m")
-        if(len(p)> 2):
-            print(f"Declarando função {p[2]} com tipo {p[1]} e parâmetros {p[4]}")
+        print(f"Declarando função {p[2]} com tipo {p[1]} e parâmetros {p[4]}")
+        function = Funtion(p[2], p[1], p[4]["type"])
+        self.funtions_table.append(function)
+
+        self.print_functions_table()
 
     
     
@@ -182,7 +208,6 @@ class SyntaxRules():
         '''func_name : ID
                     | MAIN'''
         # print em amarelo
-        print(f"\033[93mNome da função: {p[1]}\033[0m")
         p[0] = p[1]
         
         
@@ -202,6 +227,7 @@ class SyntaxRules():
         '''declaracao_parametros : tipos ID COMMA declaracao_parametros
                     | tipos ID 
                     | empty'''
+        self.context_level += 1
         if(len(p) == 3):
             self.variables_table.append(Variable(p[2], p[1], self.context_level))
             p[0] = {"type": [p[1]]}
@@ -212,7 +238,9 @@ class SyntaxRules():
                 for type in p[4]["type"]:
                     p_0_types.append(type)
             self.variables_table.append(Variable(p[2], p[1], self.context_level))
-        
+            p[0] = {"type":  p_0_types}   
+        else:
+            p[0] = {"type": []}
         
 
     def p_contexto(self,p):
@@ -255,24 +283,26 @@ class SyntaxRules():
         '''declaracoes : tipos definicoes SEMICOLON
                         | TYPEDEF STRUCT contexto_struct ID SEMICOLON'''
         context_counter = 0
+        print(f"aaa: {p[2]}")
         for i in p.stack:
             if i.type == "LEFTBRACES":
                 context_counter += 1
         self.context_level = context_counter
         if(len(p) == 4):
             # checa o tipo
-            if p[2]["type"] is not None:
-                p2_type = self.get_value_type(p[2]["type"])
-
-                p1_type = p[1]
-                if(self.structs_table.get_by_name(p1_type) is not None):
-                    p1_type = self.structs_table.get_by_name(p1_type).get_types_list()
-
-
-                if p1_type != p2_type:
-                    print(f"\033[91mErro: Tipo {p[1]} não é compatível com {p2_type}. Erro na linha {p.lineno(3)}\033[0m")
-                    exit(1)
-            self.variables_table.append(Variable(p[2]["name"], p[1], self.context_level))
+            if(isinstance(p[2]["type"],list)):
+                for new_var in p[2]["type"]:
+                    if new_var["name"] is not None:
+                        p2_type = self.get_value_type(new_var["type"])
+                        p1_type = p[1]
+                        if(self.structs_table.get_by_name(p1_type) is not None):
+                            p1_type = self.structs_table.get_by_name(p1_type).get_types_list()
+                        
+                        if p2_type is not None:
+                            if p1_type != p2_type:
+                                print(f"\033[91mErro: Tipo {p[1]} não é compatível com {p2_type}. Erro na linha {p.lineno(3)}\033[0m")
+                                exit(1)
+                    self.variables_table.append(Variable(new_var["name"], p[1], self.context_level))
         # else:
         else:
             attributes = []
@@ -307,10 +337,22 @@ class SyntaxRules():
                     | ID COMMA definicoes
                     | ID atribuicao COMMA definicoes'''
         
-        p[0] = {"name": p[1], "type": None}
-        if len(p) == 3 or len(p) == 5:
-            p[0] = {"name": p[1], "type": p[2]["type"]}
-
+        types = []
+        print(f"entrando em defincioções na linha {p.lineno(1)}")
+        if len(p) == 4:
+            types = p[3]["type"]
+            types.append({"name": p[1], "type": None})
+            print(f"fim types: {types}")
+        elif len(p) == 5:
+            types = p[4]["type"]
+            types.append({"name": p[1], "type": None})
+            print(f"fim types: {types}")
+        else:
+            print("sexo")
+            types.append({"name": p[1], "type": None})
+            print(f"types depois do sexo: {types}")
+        
+        p[0] = {"type": types}
 
 
     def p_comandos(self,p):
@@ -320,6 +362,7 @@ class SyntaxRules():
                     | condicional
                     | func_call SEMICOLON
                     | palavra_reservada SEMICOLON'''
+        print("COMANDOS")
         
     
     def p_valores(self,p):
@@ -364,7 +407,7 @@ class SyntaxRules():
         if p.slice[1].type == "ID":
             var = self.variables_table.get_by_name(p[1])
             if var is None:
-                print(f"\033[91mErro: Variável {p[1]} não foi declarada (valor)\033[0m")
+                print(f"\033[91mErro: Variável {p[1]} não foi declarada (valor). Erro na linha {p.lineno(1)}\033[0m")
                 exit(1)
             p[0] = {"type": var.type}
         else:
@@ -381,6 +424,7 @@ class SyntaxRules():
         p[0] = p[1]
 
     def get_value_type(self, value):
+        print(f"get value type: {value}")
         if (isinstance(value, list)):
             struct_name = ""
             for i in range(len(value)):
@@ -402,12 +446,14 @@ class SyntaxRules():
                 else:
                     struct_name = value_name.type
         else:
+            
             return value
 
 
     def p_operacao(self,p):
         '''operacao : valor operadores operacao
                     | valor '''
+        print("OPERACAO")
     
         if len(p) == 2:
             p[0] = {"type": p[1]["type"]}
@@ -451,7 +497,7 @@ class SyntaxRules():
         
         match p.slice[1].type:
             case "INTEGERCONST":
-                p[0] = {"type": {"int"}}
+                p[0] = {"type": "int"}
             case "FLOATCONST":
                 p[0] = {"type": "float"}
             case "STRING":
@@ -466,6 +512,7 @@ class SyntaxRules():
     def p_loop(self,p):
         '''loop : while
                 | for'''
+        print("LOOP")
         
 
     def p_while(self,p):
@@ -473,11 +520,15 @@ class SyntaxRules():
         
 
     def p_for(self,p):
-        '''for : FOR LEFTPAREN tipos ID SEMICOLON condicao SEMICOLON atribuicao RIGHTPAREN contexto
+        '''for : FOR LEFTPAREN tipos ID SEMICOLON condicao SEMICOLON ID atribuicao RIGHTPAREN contexto
                 | FOR LEFTPAREN tipos ID SEMICOLON condicao SEMICOLON operacao_especial RIGHTPAREN contexto
-                | FOR LEFTPAREN tipos ID ATTRIBUTION valor SEMICOLON condicao SEMICOLON atribuicao RIGHTPAREN contexto
+                | FOR LEFTPAREN tipos ID ATTRIBUTION valor SEMICOLON condicao SEMICOLON ID atribuicao RIGHTPAREN contexto
                 | FOR LEFTPAREN tipos ID ATTRIBUTION valor SEMICOLON condicao SEMICOLON operacao_especial RIGHTPAREN contexto'''
         
+        # declaração de variável
+        print(f"FOR DETECTADO")
+        self.context_level += 1
+        self.variables_table.append(Variable(p[4], p[3], self.context_level))
 
     def p_condicional(self,p):
         '''condicional : IF LEFTPAREN condicao RIGHTPAREN contexto
@@ -488,7 +539,7 @@ class SyntaxRules():
         '''condicao : operacao comparador valor
                     | LEFTPAREN condicao RIGHTPAREN
                     | condicao comparador condicao'''
-        
+        print("CONDIÇÃO")
 
     def p_comparador(self,p):
         '''comparador : EQUALTO
@@ -505,7 +556,14 @@ class SyntaxRules():
     def p_func_call(self,p):
         '''func_call : ID LEFTPAREN parametros_chamada RIGHTPAREN'''
         # TODO: Implementar  tabela de funções
-        p[0] = {"type": "FUNC"}
+
+        function = self.funtions_table.get_by_name(p[1])
+        if function is None:
+            print(f"\033[91mErro: Função {p[1]} não foi declarada\033[0m")
+            exit(1)
+        else:
+            p[0] = {"type": function.type}
+
 
     def p_parametros_chamada(self,p):
         '''parametros_chamada : valor

@@ -7,10 +7,10 @@ from analyser.compiler import Compiler
 
 # entrada do arquivo com o código fonte como argumento usando argparse
 if __name__ == '__main__':
-    # parser = argparse.ArgumentParser(description='Analisador Léxico')
-    # parser.add_argument('arquivo', type=string, help='Arquivo de entrada')
-    # args = parser.parse_args()
-    file_name = "../c_tests/teste_personalizado.c"
+    parser = argparse.ArgumentParser(description='Analisador Léxico')
+    parser.add_argument('arquivo', type=str, help='Arquivo de entrada')
+    args = parser.parse_args()
+    file_name = args.arquivo
 
     # open file
     file = open(file_name, 'r')
