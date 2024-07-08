@@ -110,7 +110,6 @@ class Funtion():
         self.type = type
         self.name = name
         self.params = params
-        print(f"Função {name} com tipo {type} e parâmetros {params}")
     def get_params_str(self):
         content = ""
         for param in self.params:
@@ -166,7 +165,6 @@ class DefinesTable():
         self.cols = ["Nome".ljust(self.col_size), "Valor".ljust(self.col_size), "Tipo".ljust(self.col_size)]
 
     def append(self, define):
-        print("deeee")
         for defin in self.defines:
             if defin.name == define.name:
                 print(f"\033[91mErro: Função {define.name} já foi declarada\033[0m")
@@ -224,7 +222,6 @@ class SyntaxRules():
                     | defines inicial
                     | declaracoes inicial
                     | empty'''
-        print("inicial")
         
     def p_includes(self,p):
         '''includes : INCLUDE INCLUDECONTENT includes
@@ -235,7 +232,6 @@ class SyntaxRules():
 
     def p_defines(self,p):
         '''defines : DEFINE ID constants'''
-        print(f"DEFINE - p0: {p[0]}, p1: {p[1]}, p2: {p[2]}, p3: {p[3]}")
         define = Define(p[2], p[3]["value"], p[3]["type"])
         self.defines_table.append(define)
         
@@ -243,19 +239,15 @@ class SyntaxRules():
 
     def p_declaracoes_func(self,p):
         '''declaracoes_func : tipos func_name LEFTPAREN declaracao_parametros RIGHTPAREN contexto'''
-        # print em amaerelo
-        print(f"Declarando função {p[2]} com tipo {p[1]} e parâmetros {p[4]}")
         function = Funtion(p[2], p[1], p[4]["type"])
         self.funtions_table.append(function)
 
-        self.print_functions_table()
 
     
     
     def p_func_name(self,p):
         '''func_name : ID
                     | MAIN'''
-        # print em amarelo
         p[0] = p[1]
         
         
@@ -303,7 +295,6 @@ class SyntaxRules():
         self.context_level = context_counter
         # remove variáveis do contexto que são maior que o contexto atual
         self.variables_table.variables = [var for var in self.variables_table.variables if int(var.context) <= self.context_level]
-        # self.print_variables_table()
         
 
     def p_context_content(self,p):
@@ -404,7 +395,6 @@ class SyntaxRules():
                     | condicional
                     | func_call SEMICOLON
                     | palavra_reservada SEMICOLON'''
-        print("COMANDOS")
         
     
     def p_valores(self,p):
@@ -449,7 +439,6 @@ class SyntaxRules():
         if p.slice[1].type == "ID":
             var = self.variables_table.get_by_name(p[1])
             if var is None:
-                self.print_defines_table()
 
                 var = self.defines_table.get_by_name(p[1])
                 if var is None:
@@ -498,7 +487,6 @@ class SyntaxRules():
     def p_operacao(self,p):
         '''operacao : valor operadores operacao
                     | valor '''
-        print("OPERACAO")
     
         if len(p) == 2:
             p[0] = {"type": p[1]["type"]}
@@ -562,7 +550,6 @@ class SyntaxRules():
     def p_loop(self,p):
         '''loop : while
                 | for'''
-        print("LOOP")
         
 
     def p_while(self,p):
@@ -576,7 +563,6 @@ class SyntaxRules():
                 | FOR LEFTPAREN ID ATTRIBUTION valor SEMICOLON condicao SEMICOLON operacao_especial RIGHTPAREN contexto'''
         
         # declaração de variável
-        print(f"FOR DETECTADO")
         self.context_level += 1
         self.variables_table.append(Variable(p[4], p[3], self.context_level))
 
@@ -589,7 +575,6 @@ class SyntaxRules():
         '''condicao : operacao comparador valor
                     | LEFTPAREN condicao RIGHTPAREN
                     | condicao comparador condicao'''
-        print("CONDIÇÃO")
 
     def p_comparador(self,p):
         '''comparador : EQUALTO
