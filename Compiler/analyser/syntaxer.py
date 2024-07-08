@@ -34,7 +34,6 @@ class VariableTable():
         content = content+ ("-" * (self.col_size * 3 +8)) + "\n"
         for variable in self.variables:
             content += variable.value.ljust(self.col_size) + " | " + variable.type.ljust(self.col_size) + " | " + variable.context.ljust(self.col_size) + " |\n"
-
         return content
 
 
@@ -55,6 +54,7 @@ class Struct():
     
     def get_attr_by_name(self, name):
         for attr in self.attributes:
+            print(f"attr.attr_name: {attr.attr_name} name: {name}")
             if attr.attr_name == name:
                 return attr
         return None
@@ -65,6 +65,12 @@ class Struct():
                 return True
         return False
     
+    def get_types_list(self):
+        types = []
+        for attr in self.attributes:
+            types.append(attr.attr_type)
+        return types
+
 class StructsTable():
     def __init__(self):
         self.structs = []
@@ -72,9 +78,9 @@ class StructsTable():
         self.cols = ["Nome".ljust(self.col_size) ,"Atributos".ljust(self.col_size)]
 
     def append(self, struct):
-        for struct in self.structs:
-            if struct.value == struct.value:
-                print(f"\033[91mErro: Struct {p[2]} já foi declarada\033[0m")
+        for strct in self.structs:
+            if strct.value == struct.value:
+                print(f"\033[91mErro: Struct {strct.value} já foi declarada\033[0m")
                 exit(1)
         self.structs.append(struct)
 
@@ -100,9 +106,38 @@ class StructsTable():
         return content
     
 
+class Funtion():
+    def __init__(self, name, type):
+        self.type = type
+        self.name = name
+
+class Functionstable():
+    def __init__(self):
+        self.functions = []
+        self.col_size = 10
+        self.cols = ["Nome".ljust(self.col_size), "Tipo".ljust(self.col_size)]
+    def append(self, function):
+        for func in self.functions:
+            if func.name == function.name:
+                print(f"\033[91mErro: Função {function.name} já foi declarada\033[0m")
+                exit(1)
+        self.functions.append(function)
+    
+    def __str__(self):
+        content = ""
+        for col in self.cols:
+            content = content + col + " | "
+        content = content + "\n"
+        content = content+ ("-" * (self.col_size * 3 +8)) + "\n"
+        for function in self.functions:
+            content += function.value.ljust(self.col_size) + " | " + function.type.ljust(self.col_size) + " | " + function.context.ljust(self.col_size) + " |\n"
+        return content
+
+
 class SyntaxRules():
     variables_table = VariableTable()
     structs_table = StructsTable()
+    funtions_table = Functionstable()
     context_level = 0
 
     def print_variables_table(self):
@@ -136,15 +171,20 @@ class SyntaxRules():
 
     def p_declaracoes_func(self,p):
         '''declaracoes_func : tipos func_name LEFTPAREN declaracao_parametros RIGHTPAREN contexto declaracoes_func
-                            | tipos func_name LEFTPAREN declaracao_parametros RIGHTPAREN contexto SEMICOLON declaracoes_func
                             | empty'''
-        
+        # print em amaerelo
+        print(f"\033[93mDeclarando função\033[0m")
+        if(len(p)> 2):
+            print(f"Declarando função {p[2]} com tipo {p[1]} e parâmetros {p[4]}")
 
     
     
     def p_func_name(self,p):
         '''func_name : ID
                     | MAIN'''
+        # print em amarelo
+        print(f"\033[93mNome da função: {p[1]}\033[0m")
+        p[0] = p[1]
         
         
 
@@ -163,6 +203,16 @@ class SyntaxRules():
         '''declaracao_parametros : tipos ID COMMA declaracao_parametros
                     | tipos ID 
                     | empty'''
+        if(len(p) == 3):
+            self.variables_table.append(Variable(p[2], p[1], self.context_level))
+            p[0] = {"type": [p[1]]}
+        elif(len(p) == 5):
+            p_0_types = [p[1]]
+            # checa se é uma lista de tipos
+            if isinstance(p[4]["type"], list):
+                for type in p[4]["type"]:
+                    p_0_types.append(type)
+            self.variables_table.append(Variable(p[2], p[1], self.context_level))
         
         
 
@@ -216,8 +266,17 @@ class SyntaxRules():
         if(len(p) == 4):
             # checa o tipo
             if p[2]["type"] is not None:
-                if p[1] != p[2]["type"]:
-                    print(f"\033[91mErro: Tipo {p[1]} não é compatível com {p[2]['type']}\033[0m")
+                self.print_variables_table()
+                print(f"p2: {p[2]}")
+                p2_type = self.get_value_type(p[2]["type"])
+
+                p1_type = p[1]
+                if(self.structs_table.get_by_name(p1_type) is not None):
+                    p1_type = self.structs_table.get_by_name(p1_type).get_types_list()
+
+
+                if p1_type != p2_type:
+                    print(f"\033[91mErro: Tipo {p[1]} não é compatível com {p2_type}. Erro na linha {p.lineno(3)}\033[0m")
                     exit(1)
             self.variables_table.append(Variable(p[2]["name"], p[1], self.context_level))
         # else:
@@ -229,7 +288,6 @@ class SyntaxRules():
                 attributes.append(StructAttribute(attr["name"], attr["type"]))
             self.structs_table.append(Struct(p[4], attributes))
             print(f"Struct {p[4]} criada com os atributos {attributes}")
-                   
 
 
         self.print_variables_table()
@@ -320,7 +378,7 @@ class SyntaxRules():
         if p.slice[1].type == "ID":
             var = self.variables_table.get_by_name(p[1])
             if var is None:
-                print(f"\033[91mErro: Variável {p[1]} não foi declarada\033[0m")
+                print(f"\033[91mErro: Variável {p[1]} não foi declarada (valor)\033[0m")
                 exit(1)
             p[0] = {"type": var.type}
         else:
@@ -336,6 +394,27 @@ class SyntaxRules():
     
         p[0] = p[1]
 
+    def get_value_type(self, value):
+        if (isinstance(value, list)):
+            struct_name = ""
+            for i in range(len(value)):
+                print(f"value[{i}]: {value[i]}")
+                value_name = self.variables_table.get_by_name(value[i])
+                if(isinstance(value[i], list)):
+                    return value[i]
+                if(value_name is None):
+                    print(f"struct_name: {struct_name}")
+                    attr_name = value[i]
+                    value_name = self.structs_table.get_by_name(struct_name).get_attr_by_name(attr_name).attr_type
+                    print(f"value struct: {value_name}")
+                    return value_name
+                else:
+                    struct_name = value_name.type
+                    print(f"setting struct_name: {struct_name}")
+        else:
+            return value
+
+
     def p_operacao(self,p):
         '''operacao : valor operadores operacao
                     | valor '''
@@ -343,8 +422,18 @@ class SyntaxRules():
         if len(p) == 2:
             p[0] = {"type": p[1]["type"]}
         else:
-            if p[1]["type"] != p[3]["type"]:
-                print(f"\033[91mErro: Operação entre tipos incompatíveis {p[1]['type']} e {p[3]['type']}\033[0m")
+            self.print_variables_table()
+            self.print_structs_table()
+            print(f'p1: {p[1]} | p2: {p[2]}')
+
+            p1_type = self.get_value_type(p[1]["type"])
+            p3_type = self.get_value_type(p[3]["type"])
+            
+            
+
+            print(f"p1_type: {p1_type} p3_type: {p3_type}")
+            if p1_type != p3_type:
+                print(f"\033[91mErro: Operação entre tipos incompatíveis {p[1]['type']} e {p[3]['type']} na linha {p.lineno(3)}\033[0m")
                 print(f"DEV COMMENT: Só pode operação com o mesmo tipo de variável por enquanto")
                 exit(1)
             p[0] = {"type": p[1]["type"]}
@@ -364,7 +453,8 @@ class SyntaxRules():
                     | ID DOT atributo
                     | ID POINTER atributo'''
 
-        p[0] = {"type": "ATTR"}
+        
+        p[0] = {"type": [p[1], p[3]]}
         
 
     def p_constants(self,p):
@@ -375,13 +465,13 @@ class SyntaxRules():
         
         match p.slice[1].type:
             case "INTEGERCONST":
-                p[0] = {"type": "INT"}
+                p[0] = {"type": {"int"}}
             case "FLOATCONST":
-                p[0] = {"type": "FLOAT"}
+                p[0] = {"type": "float"}
             case "STRING":
-                p[0] = {"type": "STRING"}
+                p[0] = {"type": "string"}
             case "CHARCONST":
-                p[0] = {"type": "CHAR"}
+                p[0] = {"type": "char"}
             case _:
                 print(f"\033[91mErro: Constante {p[1]} não reconhecida\033[0m - ISSO NÃO DEVIA TER ACONTECIDO")
                 exit(1)
