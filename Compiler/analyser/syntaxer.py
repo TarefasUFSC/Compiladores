@@ -337,7 +337,6 @@ class SyntaxRules():
                             p1_type = self.structs_table.get_by_name(p1_type).get_types_list()
                         
                         if p2_type is not None:
-                            print(f'p1_type: {p1_type} p2_type: {p2_type}')
                             if p1_type != p2_type:
                                 print(f"\033[91mErro: Tipo {p[1]} não é compatível com {p2_type}. Erro na linha {p.lineno(3)}\033[0m")
                                 exit(1)
@@ -345,12 +344,10 @@ class SyntaxRules():
                         if(new_var["type"] is not None):
                             p2_type = self.get_value_type(new_var["type"])
                             p1_type = p[1]
-                            print(f"p1_type: {p1_type} p2_type: {p2_type}")
                             if(self.structs_table.get_by_name(p1_type) is not None):
                                 p1_type = self.structs_table.get_by_name(p1_type).get_types_list()
                             
                             if p2_type is not None:
-                                print(f'p1_type: {p1_type} p2_type: {p2_type}')
                                 if p1_type != p2_type:
                                     print(f"\033[91mErro: Tipo {p[1]} não é compatível com {p2_type}. Erro na linha {p.lineno(3)}\033[0m")
                                     exit(1)
